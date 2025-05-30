@@ -178,7 +178,12 @@ export default function MentorsAdminPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-tight">Mentors</h1>
-        <Button onClick={openAddDialog}>Add Mentor</Button>
+        <div className="flex gap-2">
+          <Button asChild variant="secondary">
+            <a href="/admin/mentors/bookings">View Bookings</a>
+          </Button>
+          <Button onClick={openAddDialog}>Add Mentor</Button>
+        </div>
       </div>
       <div className="max-w-xs mb-2">
         <Input

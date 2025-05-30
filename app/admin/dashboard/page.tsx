@@ -19,19 +19,87 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  newClubApplications,
-  clubCollaborations,
-  centralTeamApplications,
-  companies,
-  enquiries,
-  coreTeamApplications,
-  coreTeamRoles,
-  courses,
-  events,
-} from "@/lib/data";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function DashboardPage() {
+  const [newClubApplications, setNewClubApplications] = useState<any[]>([]);
+  const [clubCollaborations, setClubCollaborations] = useState<any[]>([]);
+  const [centralTeamApplications, setCentralTeamApplications] = useState<any[]>(
+    []
+  );
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [enquiries, setEnquiries] = useState<any[]>([]);
+  const [coreTeamApplications, setCoreTeamApplications] = useState<any[]>([]);
+  const [coreTeamRoles, setCoreTeamRoles] = useState<any[]>([]);
+  const [courses, setCourses] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = Cookies.get("token");
+    const headers = { Authorization: `Bearer ${token}` };
+
+    Promise.all([
+      axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/club-partner/club-applications`,
+        {
+          headers,
+        }
+      ),
+      axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/club-partner/collaboration-requests`,
+        {
+          headers,
+        }
+      ),
+      axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/club-partner/central-team-applications`,
+        { headers }
+      ),
+      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/companies`, {
+        headers,
+      }),
+      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/contact`, {
+        headers,
+      }),
+      axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/core-team-application`,
+        { headers }
+      ),
+      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/core-team-role`, {
+        headers,
+      }),
+      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/courses`, { headers }),
+      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/events`, { headers }),
+    ])
+      .then(
+        ([
+          newClubRes,
+          clubCollabRes,
+          centralTeamRes,
+          companiesRes,
+          enquiriesRes,
+          coreTeamAppRes,
+          coreTeamRolesRes,
+          coursesRes,
+          eventsRes,
+        ]) => {
+          setNewClubApplications(newClubRes.data);
+          setClubCollaborations(clubCollabRes.data);
+          setCentralTeamApplications(centralTeamRes.data);
+          setCompanies(companiesRes.data);
+          setEnquiries(enquiriesRes.data);
+          setCoreTeamApplications(coreTeamAppRes.data);
+          setCoreTeamRoles(coreTeamRolesRes.data);
+          setCourses(coursesRes.data);
+          setEvents(eventsRes.data);
+        }
+      )
+      .finally(() => setLoading(false));
+  }, []);
+
   const stats = [
     {
       title: "New Clubs Applications",
@@ -126,6 +194,16 @@ export default function DashboardPage() {
     },
   ];
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <span className="text-lg text-muted-foreground">
+          Loading dashboard...
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -176,9 +254,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {enquiries.slice(0, 3).map((application) => (
+              {enquiries.slice(0, 3).map((application: any) => (
                 <div
-                  key={application.id}
+                  key={application.id || application._id}
                   className="flex items-center justify-between border-b border-border pb-4 last:border-0 last:pb-0"
                 >
                   <div>
@@ -188,9 +266,7 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/admin/applications?id=${application.id}`}>
-                      Details
-                    </Link>
+                    <Link href={`/admin/enquiries`}>Details</Link>
                   </Button>
                 </div>
               ))}
@@ -205,26 +281,29 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {coreTeamApplications.slice(0, 3).map((application) => (
+              {coreTeamApplications.slice(0, 3).map((application: any) => (
                 <div
-                  key={application.id}
+                  key={application.id || application._id}
                   className="flex items-center justify-between border-b border-border pb-4 last:border-0 last:pb-0"
                 >
                   <div>
                     <p className="font-medium">{application.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {application.roleId
-                        .split("-")
-                        .map(
-                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
-                        )
-                        .join(" ")}
+                      {typeof application.roleId === "string"
+                        ? application.roleId
+                            .split("-")
+                            .map(
+                              (word: string) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ")
+                        : application.roleId && application.roleId.name // If it's an object with a name property
+                        ? application.roleId.name
+                        : ""}
                     </p>
                   </div>
                   <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/admin/core-team?id=${application.id}`}>
-                      Details
-                    </Link>
+                    <Link href={`/admin/coreTeamApplications`}>Details</Link>
                   </Button>
                 </div>
               ))}

@@ -55,6 +55,11 @@ export function Sidebar({ className }: SidebarProps) {
 
   const NavItems = [
     {
+      title: "Dashboard",
+      href: "/admin/dashboard",
+      icon: <LayoutDashboard className="h-5 w-5" />,
+    },
+    {
       title: "Central Team Applications",
       href: "/admin/centralTeamApplications",
       icon: <Users className="h-5 w-5" />,
@@ -84,11 +89,7 @@ export function Sidebar({ className }: SidebarProps) {
       href: "/admin/courses",
       icon: <BookOpen className="h-5 w-5" />,
     },
-    {
-      title: "Dashboard",
-      href: "/admin/dashboard",
-      icon: <LayoutDashboard className="h-5 w-5" />,
-    },
+
     {
       title: "Enquiries",
       href: "/admin/enquiries",
