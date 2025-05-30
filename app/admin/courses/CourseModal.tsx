@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
-import { Course } from "@/lib/data";
+import { Course } from "./columns";
 
 interface CourseModalProps {
   open: boolean;
