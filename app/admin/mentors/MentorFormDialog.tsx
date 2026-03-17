@@ -25,6 +25,7 @@ export function MentorFormDialog({
   onOpenChange,
   onSave,
   initialMentor,
+  loading,
 }: MentorFormDialogProps) {
   const [form, setForm] = useState({
     name: "",
@@ -185,10 +186,13 @@ export function MentorFormDialog({
               type="file"
               onChange={handleFileChange}
               accept="image/*"
+              required={!initialMentor}
             />
           </div>
           <DialogFooter>
-            <Button type="submit">{initialMentor ? "Update" : "Add"}</Button>
+            <Button type="submit" disabled={loading}>
+              {initialMentor ? "Update" : "Add"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

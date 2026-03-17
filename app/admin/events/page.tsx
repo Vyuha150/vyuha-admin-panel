@@ -31,11 +31,21 @@ export default function EventsAdminPage() {
       try {
         const token = Cookies.get("token");
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/events`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          `${process.env.NEXT_PUBLIC_API_URL}/api/events?summary=true`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            timeout: 12000,
+          }
         );
         setEvents(res.data);
       } catch (err: any) {
+        if (err?.code === "ECONNABORTED") {
+          setError(
+            "Request timed out while loading events. Please check backend server and refresh."
+          );
+          return;
+        }
+
         setError(
           err?.response?.data?.message ||
             "Failed to load events. Please try again."
@@ -48,17 +58,24 @@ export default function EventsAdminPage() {
   }, []);
 
   // Add or Edit event (with file upload)
-  const handleSave = async (event: Partial<Event>, file?: File | null) => {
+  const handleSave = async (
+    event: Partial<Event>,
+    imageFile?: File | null,
+    logoFile?: File | null
+  ) => {
     const token = Cookies.get("token");
     try {
       const formData = new FormData();
       Object.entries(event).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, value as string);
+        if (value !== undefined && value !== null && value !== "") {
+          formData.append(key, String(value));
         }
       });
-      if (file) {
-        formData.append("image", file);
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+      if (logoFile) {
+        formData.append("logo", logoFile);
       }
 
       if (editEvent) {
@@ -93,7 +110,13 @@ export default function EventsAdminPage() {
       setModalOpen(false);
       setEditEvent(null);
     } catch (err: any) {
+      const validationErrors = err?.response?.data?.errors;
+      const validationMessage = Array.isArray(validationErrors)
+        ? validationErrors.map((e: any) => e?.msg).filter(Boolean).join(", ")
+        : "";
+
       setError(
+        validationMessage ||
         err?.response?.data?.message ||
           "Failed to save event. Please try again."
       );
@@ -119,8 +142,20 @@ export default function EventsAdminPage() {
   };
 
   // View details
-  const handleView = (event: Event) => {
-    setViewEvent(event);
+  const handleView = async (event: Event) => {
+    const token = Cookies.get("token");
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/events/${event._id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          timeout: 12000,
+        }
+      );
+      setViewEvent(res.data);
+    } catch {
+      setViewEvent(event);
+    }
     setDetailsOpen(true);
   };
 

@@ -87,7 +87,19 @@ export default function OrganizationsAdminPage() {
           },
         }
       );
-      setOrganizations((prev) => [res.data, ...prev]);
+
+      const createdOrganization =
+        res.data?.organization || (res.data?._id ? res.data : null);
+
+      if (createdOrganization) {
+        setOrganizations((prev) => [createdOrganization, ...prev]);
+      } else {
+        const refresh = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/organization`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setOrganizations(refresh.data || []);
+      }
       setFormOpen(false);
     } catch (err: any) {
       setError(

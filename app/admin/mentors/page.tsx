@@ -95,7 +95,10 @@ export default function MentorsAdminPage() {
           },
         }
       );
-      setMentors((prev) => [res.data, ...prev]);
+      const createdMentor = res.data?.mentor || null;
+      if (createdMentor) {
+        setMentors((prev) => [createdMentor, ...prev]);
+      }
       setFormOpen(false);
     } catch (err: any) {
       setError(

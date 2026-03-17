@@ -333,13 +333,18 @@ export function EventModal({
             <label className="w-40 font-medium" htmlFor="mode">
               Mode
             </label>
-            <Input
+            <select
               id="mode"
               name="mode"
               value={form.mode}
               onChange={handleChange}
               required
-            />
+              className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="">Select mode</option>
+              <option value="online">Online</option>
+              <option value="offline">Offline</option>
+            </select>
           </div>
           <div className="flex items-center gap-4">
             <label className="w-40 font-medium" htmlFor="targetAudience">

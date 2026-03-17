@@ -45,7 +45,11 @@ export default function CoursesAdminPage() {
   }, []);
 
   // Add or Edit course (with file upload)
-  const handleSave = async (course: Partial<Course>, file?: File | null) => {
+  const handleSave = async (
+    course: Partial<Course>,
+    coursePhotoFile?: File | null,
+    instructorPhotoFile?: File | null
+  ) => {
     const token = Cookies.get("token");
     try {
       const formData = new FormData();
@@ -57,8 +61,11 @@ export default function CoursesAdminPage() {
           formData.append(key, value as string);
         }
       });
-      if (file) {
-        formData.append("coursePhoto", file);
+      if (coursePhotoFile) {
+        formData.append("coursePhoto", coursePhotoFile);
+      }
+      if (instructorPhotoFile) {
+        formData.append("instructorPhoto", instructorPhotoFile);
       }
 
       if (editCourse) {

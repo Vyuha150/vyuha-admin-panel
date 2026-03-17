@@ -77,7 +77,7 @@ export default function CompaniesPage() {
     try {
       if (editCompany) {
         // Edit
-        await axios.put(
+        const res = await axios.put(
           `${process.env.NEXT_PUBLIC_API_URL}/api/companies/${editCompany._id}`,
           fields,
           {
@@ -89,10 +89,14 @@ export default function CompaniesPage() {
             },
           }
         );
-        // refetch or update state as needed
+          setCompanies((prev) =>
+            prev.map((company) =>
+              company._id === editCompany._id ? res.data : company
+            )
+          );
       } else {
         // Add
-        await axios.post(
+          const res = await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/api/companies`,
           fields,
           {
@@ -104,10 +108,14 @@ export default function CompaniesPage() {
             },
           }
         );
-        // refetch or update state as needed
+          setCompanies((prev) => [res.data, ...prev]);
       }
-    } catch {
-      alert("Failed to save company.");
+        setModalOpen(false);
+        setEditCompany(null);
+    } catch (err: any) {
+      const message = err?.response?.data?.message || "Failed to save company.";
+        setError(message);
+        alert(message);
     }
   };
 

@@ -158,13 +158,19 @@ export function ProjectFormDialog({
             <label className="w-40 font-medium" htmlFor="difficulty">
               Difficulty
             </label>
-            <Input
+            <select
               id="difficulty"
               name="difficulty"
               value={form.difficulty}
               onChange={handleChange}
+              className="w-full border rounded px-2 py-2"
               required
-            />
+            >
+              <option value="">Select difficulty</option>
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
           </div>
           <div className="flex items-center gap-4">
             <label className="w-40 font-medium" htmlFor="teamSize">

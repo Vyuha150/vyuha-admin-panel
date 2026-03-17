@@ -39,7 +39,7 @@ export default function LoginPage() {
 
       const data = res.data;
 
-      if (data.role !== "admin") {
+      if (!["admin", "sub-admin"].includes(data.role)) {
         setError("You are not authorized to access the admin panel.");
         setIsLoading(false);
         return;
@@ -79,13 +79,13 @@ export default function LoginPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">Email</Label>
               <Input
                 id="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
+                placeholder="Enter your email"
                 required
                 autoComplete="username"
               />

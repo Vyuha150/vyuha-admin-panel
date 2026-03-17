@@ -17,7 +17,11 @@ export function middleware(req: NextRequest) {
   try {
     const decoded: { exp: number; role?: string } = jwtDecode(token);
     const now = Math.floor(Date.now() / 1000);
-    if (decoded.exp < now || decoded.role !== "admin") {
+    if (
+      decoded.exp < now ||
+      !decoded.role ||
+      !["admin", "sub-admin"].includes(decoded.role)
+    ) {
       return NextResponse.redirect(new URL("/admin/login", req.url));
     }
   } catch (e) {

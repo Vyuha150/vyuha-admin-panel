@@ -14,7 +14,11 @@ import { Course } from "./columns";
 interface CourseModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (course: Partial<Course>, file?: File | null) => void;
+  onSave: (
+    course: Partial<Course>,
+    coursePhotoFile?: File | null,
+    instructorPhotoFile?: File | null
+  ) => void;
   initialData?: Course | null;
 }
 
@@ -42,7 +46,10 @@ export function CourseModal({
     reviews: "",
     enrollLink: "",
   });
-  const [file, setFile] = useState<File | null>(null);
+  const [coursePhotoFile, setCoursePhotoFile] = useState<File | null>(null);
+  const [instructorPhotoFile, setInstructorPhotoFile] = useState<File | null>(
+    null
+  );
 
   useEffect(() => {
     if (initialData) {
@@ -55,7 +62,8 @@ export function CourseModal({
           ? initialData.learningObjectives.join(", ")
           : initialData.learningObjectives || "",
       });
-      setFile(null);
+      setCoursePhotoFile(null);
+      setInstructorPhotoFile(null);
     } else {
       setForm({
         title: "",
@@ -75,7 +83,8 @@ export function CourseModal({
         reviews: "",
         enrollLink: "",
       });
-      setFile(null);
+      setCoursePhotoFile(null);
+      setInstructorPhotoFile(null);
     }
   }, [initialData, open]);
 
@@ -84,7 +93,13 @@ export function CourseModal({
   ) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFile(e.target.files?.[0] || null);
+    const selected = e.target.files?.[0] || null;
+    if (e.target.name === "coursePhoto") {
+      setCoursePhotoFile(selected);
+    }
+    if (e.target.name === "instructorPhoto") {
+      setInstructorPhotoFile(selected);
+    }
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -101,7 +116,8 @@ export function CourseModal({
           .map((s) => s.trim())
           .filter(Boolean),
       },
-      file
+      coursePhotoFile,
+      instructorPhotoFile
     );
     onOpenChange(false);
   };
@@ -293,6 +309,19 @@ export function CourseModal({
             />
           </div>
           <div className="flex items-center gap-4">
+            <label className="w-40 font-medium" htmlFor="instructorPhoto">
+              Instructor Photo
+            </label>
+            <Input
+              id="instructorPhoto"
+              name="instructorPhoto"
+              type="file"
+              onChange={handleFileChange}
+              accept="image/*"
+              required={!initialData}
+            />
+          </div>
+          <div className="flex items-center gap-4">
             <label className="w-40 font-medium" htmlFor="coursePhoto">
               Course Photo
             </label>
@@ -302,6 +331,7 @@ export function CourseModal({
               type="file"
               onChange={handleFileChange}
               accept="image/*"
+              required={!initialData}
             />
           </div>
           <DialogFooter>

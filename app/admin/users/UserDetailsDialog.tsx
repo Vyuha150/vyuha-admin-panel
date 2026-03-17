@@ -24,6 +24,8 @@ export function UserDetailsDialog({
 }: UserDetailsDialogProps) {
   if (!user) return null;
 
+  const displayName = user.name || user.username || "-";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -32,7 +34,7 @@ export function UserDetailsDialog({
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <span className="text-xl font-bold">{user.name}</span>
+            <span className="text-xl font-bold">{displayName}</span>
             {user.role && (
               <Badge variant="secondary" className="capitalize">
                 {user.role}
@@ -50,7 +52,7 @@ export function UserDetailsDialog({
           {user.profilePicture && (
             <img
               src={user.profilePicture}
-              alt={user.name}
+              alt={displayName}
               className="w-32 h-32 object-cover rounded border"
             />
           )}

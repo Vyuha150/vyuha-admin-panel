@@ -29,8 +29,9 @@ export function UserFormDialog({
   loading,
 }: UserFormDialogProps) {
   const [form, setForm] = useState({
-    name: "",
+    username: "",
     email: "",
+    password: "",
     phone: "",
     address: "",
     dob: "",
@@ -41,8 +42,9 @@ export function UserFormDialog({
   useEffect(() => {
     if (initialData) {
       setForm({
-        name: initialData.name || "",
+        username: initialData.username || initialData.name || "",
         email: initialData.email || "",
+        password: "",
         phone: initialData.phone || "",
         address: initialData.address || "",
         dob: initialData.dob || "",
@@ -51,8 +53,9 @@ export function UserFormDialog({
       });
     } else {
       setForm({
-        name: "",
+        username: "",
         email: "",
+        password: "",
         phone: "",
         address: "",
         dob: "",
@@ -67,7 +70,17 @@ export function UserFormDialog({
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    onSave(form);
+    const payload: Partial<User> & { password?: string; username?: string } = {
+      ...form,
+      name: form.username,
+      username: form.username,
+    };
+
+    if (isEdit && !form.password.trim()) {
+      delete payload.password;
+    }
+
+    onSave(payload);
     onOpenChange(false);
   };
 
@@ -79,13 +92,13 @@ export function UserFormDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-3 py-2">
           <div className="flex items-center gap-4">
-            <label className="w-40 font-medium" htmlFor="name">
-              Name
+            <label className="w-40 font-medium" htmlFor="username">
+              Username
             </label>
             <Input
-              id="name"
-              name="name"
-              value={form.name}
+              id="username"
+              name="username"
+              value={form.username}
               onChange={handleChange}
               required
             />
@@ -100,6 +113,20 @@ export function UserFormDialog({
               value={form.email}
               onChange={handleChange}
               required
+            />
+          </div>
+          <div className="flex items-center gap-4">
+            <label className="w-40 font-medium" htmlFor="password">
+              Password
+            </label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              required={!isEdit}
+              placeholder={isEdit ? "Leave blank to keep current password" : "Enter password"}
             />
           </div>
           <div className="flex items-center gap-4">

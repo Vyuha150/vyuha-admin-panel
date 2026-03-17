@@ -35,6 +35,7 @@ export default function DashboardPage() {
   const [coreTeamRoles, setCoreTeamRoles] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -73,6 +74,9 @@ export default function DashboardPage() {
       }),
       axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/courses`, { headers }),
       axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/events`, { headers }),
+      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/job-application`, {
+        headers,
+      }),
     ])
       .then(
         ([
@@ -85,6 +89,7 @@ export default function DashboardPage() {
           coreTeamRolesRes,
           coursesRes,
           eventsRes,
+          jobsRes,
         ]) => {
           setNewClubApplications(newClubRes.data);
           setClubCollaborations(clubCollabRes.data);
@@ -95,6 +100,7 @@ export default function DashboardPage() {
           setCoreTeamRoles(coreTeamRolesRes.data);
           setCourses(coursesRes.data);
           setEvents(eventsRes.data);
+          setJobs(jobsRes.data);
         }
       )
       .finally(() => setLoading(false));
@@ -175,7 +181,7 @@ export default function DashboardPage() {
     },
     {
       title: "Jobs",
-      value: enquiries.length,
+      value: jobs.length,
       icon: <FileTextIcon className="h-5 w-5" />,
       href: "/admin/jobs",
       description: "Jobs available",

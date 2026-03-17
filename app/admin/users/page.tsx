@@ -11,6 +11,12 @@ import { UserFormDialog } from "./UserFormDialog";
 
 const PAGE_SIZE = 10;
 
+const normalizeUser = (u: any): User => ({
+  ...u,
+  username: u.username || u.name || "",
+  name: u.name || u.username || "",
+});
+
 export default function UsersAdminPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [viewUser, setViewUser] = useState<User | null>(null);
@@ -33,12 +39,7 @@ export default function UsersAdminPage() {
           `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        // Map userName to name for each user
-        const usersWithName = res.data.map((u: any) => ({
-          ...u,
-          name: u.name || u.username || "",
-        }));
-        setUsers(usersWithName);
+        setUsers((res.data || []).map(normalizeUser));
       } catch (err: any) {
         setError(
           err?.response?.data?.message ||
@@ -77,7 +78,10 @@ export default function UsersAdminPage() {
         user,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setUsers((prev) => [res.data, ...prev]);
+      const createdUser = res.data?.user ? normalizeUser(res.data.user) : null;
+      if (createdUser) {
+        setUsers((prev) => [createdUser, ...prev]);
+      }
       setFormOpen(false);
     } catch (err: any) {
       setError(
@@ -99,7 +103,9 @@ export default function UsersAdminPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setUsers((prev) =>
-        prev.map((u) => (u._id === editUser._id ? res.data.user : u))
+        prev.map((u) =>
+          u._id === editUser._id ? normalizeUser(res.data.user) : u
+        )
       );
       setEditUser(null);
       setFormOpen(false);
